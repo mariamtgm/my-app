@@ -1,49 +1,84 @@
-import HousesList from "@/components/HousesList";
-import WizardsList from "@/components/WizardsList";
-import ElixirsList from "@/components/ElixirsList";
-import { HousesAPI, WizardsAPI, ElixirsAPI, HouseAPI } from "@/types";
+import HouseList from "@/components/HouseList";
+import { HouseAPI } from "@/types";
 import { GetServerSideProps } from "next";
 
 //Houses
-export const getServerSideProps: GetServerSideProps<{houses: Array<{
-  name: string;
+export const getServerSideProps = async () => {
+const props: Array<{
   id: string;
-}>}> = async () => {
-  const houses: Array<{
-    name: string;
-    id: string;
-  }> = [];
-
+  name: string;
+  houseColours: string;
+  founder: string;
+  animal: string;
+  element: string;
+  ghost: string;
+  commonRoom: string;
+  heads: Array<{
+      id: string;
+      firstName: string;
+      lastName: string;
+  }>;
+  traits: Array<
+    {
+      id: string;
+      name: string;
+    }>;
+}> = [];
   try {
     const res = await fetch("https://wizard-world-api.herokuapp.com/Houses");
     const data: HouseAPI[] = await res.json();
     console.log({data})
-    houses.push(
+    props.push(
       ...data.map((house) => {
         const name = house.name;
-        // get id from url
+        const houseColours = house.houseColours;
+        const founder = house.founder;
+        const animal = house.animal;
+        const element = house.element;
+        const ghost = house.ghost;
+        const commonRoom = house.commonRoom;
+        const heads = house.heads;
+        const traits = house.traits;
         const id = house.id;
-        return { name, id };
+        return { name, houseColours, founder, animal, element, ghost, commonRoom, heads, traits, id };
       })
     );
-
+    } catch(error) {
+      console.log(error);
+    }
     return {
       props : {
-        houses
+        data: props,
       }
     }
-  } catch (error) {
-    console.log(error);
-  }
-  return {
-    props: {
-      houses: [],
-    },
-  };
 };
+type Housesprops = {data:Array<{
+    id: string;
+    name: string;
+    houseColours: string;
+    founder: string;
+    animal: string;
+    element: string;
+    ghost: string;
+    commonRoom: string;
+    heads: Array<{
+        id: string;
+        firstName: string;
+        lastName: string;
+    }>;
+    traits: Array<
+      {
+        id: string;
+        name: string;
+      }>;
+}>;
+};
+export default function Houses(props: Housesprops) {
+  return <HouseList data = {props.data}></HouseList>;
+}
 
 // //Wizards
-// export const getServerSidePropsW = async () => {
+// export const getServerSideProps = async () => {
 //   const props: Array<{
 //     name: string;
 //     id: string;
@@ -86,7 +121,7 @@ export const getServerSideProps: GetServerSideProps<{houses: Array<{
 // };
 
 // //Elixirs
-// export const getServerSidePropsE = async () => {
+// export const getServerSideProps = async () => {
 //   const props: Array<{
 //     name: string;
 //     id: string;
@@ -127,22 +162,6 @@ export const getServerSideProps: GetServerSideProps<{houses: Array<{
 //     },
 //   };
 // };
-
-type HomeProps = {
-  houses: Array<{
-    name: string;
-    id: string;
-  }>;
-};
-
-export default function Home(props: HomeProps) {
-  console.log({props});
-  return <HousesList data={props.houses} />;
-}
-
-
-
-
 
 
 /*import Head from 'next/head'
